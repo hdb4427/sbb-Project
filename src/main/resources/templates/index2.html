@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<th:block layout:fragment="css">
+  <style>
+      /* CSS 변수를 사용한 다크 모드 색상표 */
+      :root {
+          --dark-bg-primary: #0F172A; /* 페이지 전체 배경 */
+          --dark-bg-secondary: #1E293B; /* 카드 배경 */
+          --dark-text-primary: #F1F5F9; /* 기본 텍스트 (밝은 흰색) */
+          --dark-text-secondary: #94A3B8; /* 보조 텍스트 (회색) */
+          --dark-border: #334155; /* 경계선 */
+          --dark-accent-blue: #3B82F6; /* 링크 및 버튼 */
+          --dark-accent-green: #22C55E; /* 답변 완료 */
+          --dark-accent-yellow: #EAB308; /* 진행 중 */
+      }
+
+      /* 레이아웃의 body 태그에 어두운 배경색을 강제로 적용합니다.
+        기존 layout.html에 밝은 배경이 설정되어 있을 수 있어 !important를 사용합니다.
+      */
+      body {
+          background-color: var(--dark-bg-primary) !important;
+          color: var(--dark-text-primary);
+      }
+
+      /* 부모 레이아웃의 .container 기본 스타일을 오버라이드합니다.
+        (배경색 제거, 패딩/마진 조절)
+      */
+      .container {
+          background-color: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
+      }
+
+      .dashboard-title {
+          font-size: 2rem;
+          font-weight: 700;
+          color: var(--dark-text-primary);
+          margin-bottom: 2rem;
+      }
+
+      /* 6개 요약 카드 */
+      .stat-card {
+          background-color: var(--dark-bg-secondary);
+          border-radius: 12px;
+          padding: 24px;
+          margin-bottom: 1.5rem;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-card .stat-title {
+          font-size: 0.9rem;
+          color: var(--dark-text-secondary);
+          margin-bottom: 8px;
+      }
+
+      .stat-card .stat-value {
+          font-size: 2.25rem;
+          font-weight: 700;
+          color: var(--dark-text-primary);
+      }
+
+      /* 최근 질문 / 신규 사용자 리스트 카드 */
+      .list-card {
+          background-color: var(--dark-bg-secondary);
+          border-radius: 12px;
+          padding: 24px;
+          height: 100%;
+      }
+
+      .list-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid var(--dark-border);
+      }
+
+      .list-card-header h3 {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: var(--dark-text-primary);
+          margin: 0;
+      }
+
+      .list-card-header a {
+          font-size: 0.9rem;
+          color: var(--dark-accent-blue);
+          text-decoration: none;
+          font-weight: 500;
+      }
+      .list-card-header a:hover {
+          text-decoration: underline;
+      }
+
+      /* 최근 질문 아이템 */
+      .question-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 0;
+          border-bottom: 1px solid var(--dark-border);
+      }
+      .question-item:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+      }
+      .question-item:first-child {
+          padding-top: 0;
+      }
+
+      .question-item .question-title {
+          font-size: 1rem;
+          font-weight: 500;
+          color: var(--dark-text-primary);
+          margin-bottom: 4px;
+          cursor: pointer;
+      }
+      .question-item .question-title:hover {
+          color: var(--dark-accent-blue);
+      }
+
+      .question-item .question-meta {
+          font-size: 0.8rem;
+          color: var(--dark-text-secondary);
+      }
+
+      /* 답변 상태 배지 */
+      .badge-status {
+          padding: 4px 12px;
+          border-radius: 12px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          white-space: nowrap;
+      }
+
+      .badge-answered {
+          background-color: rgba(34, 197, 94, 0.1);
+          color: var(--dark-accent-green);
+      }
+
+      .badge-open {
+          background-color: rgba(234, 179, 8, 0.1);
+          color: var(--dark-accent-yellow);
+      }
+
+      /* 신규 사용자 아이템 */
+      .user-item {
+          display: flex;
+          align-items: center;
+          padding: 10px 0;
+      }
+
+      .user-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          margin-right: 12px;
+          background-color: var(--dark-border);
+          /* 임시 플레이스홀더 스타일 */
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+      }
+      /* 아바타 이미지 대신 이니셜 사용 예시 */
+      .avatar-initial {
+          background-color: #3B82F6;
+          color: white;
+      }
+
+
+      .user-info .user-name {
+          font-size: 1rem;
+          font-weight: 500;
+          color: var(--dark-text-primary);
+      }
+
+      .user-info .user-meta {
+          font-size: 0.8rem;
+          color: var(--dark-text-secondary);
+      }
+
+  </style>
+</th:block>
+
+<div layout:fragment="content" class="container my-3">
+  <h2 class="dashboard-title">대시보드 개요</h2>
+
+  <div class="row">
+    <div class="col-lg-4 col-md-6">
+      <div class="stat-card">
+        <div class="stat-title">총 질문 수</div>
+        <div class="stat-value">1,204</div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="stat-card">
+        <div class="stat-title">답변 대기 중</div>
+        <div class="stat-value">86</div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="stat-card">
+        <div class="stat-title">오늘 새 질문</div>
+        <div class="stat-value">12</div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="stat-card">
+        <div class="stat-title">총 사용자 수</div>
+        <div class="stat-value">5,430</div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="stat-card">
+        <div class="stat-title">신규 가입 (24h)</div>
+        <div class="stat-value">32</div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="stat-card">
+        <div class="stat-title">활성 사용자</div>
+        <div class="stat-value">1,520</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8 mb-4">
+      <div class="list-card">
+        <div class="list-card-header">
+          <h3>최근 질문</h3>
+          <a th:href="@{/questions}">전체 보기</a>
+        </div>
+        <div class="list-card-body">
+          <div class="question-item">
+            <div>
+              <div class="question-title">Tailwind CSS에서 다크 모드 구현 방법</div>
+              <div class="question-meta">작성자: Jane Doe</div>
+            </div>
+            <span class="badge-status badge-open">진행 중</span>
+          </div>
+          <div class="question-item">
+            <div>
+              <div class="question-title">반응형 웹 디자인을 위한 모범 사례?</div>
+              <div class="question-meta">작성자: John Smith</div>
+            </div>
+            <span class="badge-status badge-answered">답변 완료</span>
+          </div>
+          <div class="question-item">
+            <div>
+              <div class="question-title">'let', 'const', 'var'의 정확한 차이점</div>
+              <div class="question-meta">작성자: Alex Ray</div>
+            </div>
+            <span class="badge-status badge-answered">답변 완료</span>
+          </div>
+          <div class="question-item">
+            <div>
+              <div class="question-title">React의 가상 DOM(Virtual DOM) 작동 원리</div>
+              <div class="question-meta">작성자: Sarah Lee</div>
+            </div>
+            <span class="badge-status badge-open">진행 중</span>
+          </div>
+          <div class="question-item">
+            <div>
+              <div class="question-title">div를 가운데 정렬하는 완벽 가이드</div>
+              <div class="question-meta">작성자: Mike Chen</div>
+            </div>
+            <span class="badge-status badge-answered">답변 완료</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+      <div class="list-card">
+        <div class="list-card-header">
+          <h3>신규 사용자</h3>
+          <a th:href="@{/admin/users}">사용자 관리</a>
+        </div>
+        <div class="list-card-body">
+          <div class="user-item">
+            <div class="user-avatar avatar-initial">EC</div>
+            <div class="user-info">
+              <div class="user-name">에밀리 카터</div>
+              <div class="user-meta">가입: 2시간 전</div>
+            </div>
+          </div>
+          <div class="user-item">
+            <div class="user-avatar avatar-initial" style="background-color: #FF9500;">BA</div>
+            <div class="user-info">
+              <div class="user-name">벤 아담스</div>
+              <div class="user-meta">가입: 5시간 전</div>
+            </div>
+          </div>
+          <div class="user-item">
+            <div class="user-avatar avatar-initial" style="background-color: #E040FB;">CR</div>
+            <div class="user-info">
+              <div class="user-name">클로이 로드리게스</div>
+              <div class="user-meta">가입: 1일 전</div>
+            </div>
+          </div>
+          <div class="user-item">
+            <div class="user-avatar avatar-initial" style="background-color: #22C55E;">DK</div>
+            <div class="user-info">
+              <div class="user-name">데이비드 김</div>
+              <div class="user-meta">가입: 1일 전</div>
+            </div>
+          </div>
+          <div class="user-item">
+            <div class="user-avatar avatar-initial" style="background-color: #EF4444;">OC</div>
+            <div class="user-info">
+              <div class="user-name">올리비아 첸</div>
+              <div class="user-meta">가입: 2일 전</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</html>

@@ -1,0 +1,50 @@
+/*textarea{*/
+/*    width: 100%;*/
+/*}*/
+
+/*input[type=submit] {*/
+/*    margin-top: 10px;*/
+/*}*/
+
+html {
+    position: relative;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    min-height: 100%;
+    background-color: #f0f2f5; /* 원하는 페이지 전체 배경색 */
+}
+
+
+.navbar-dark .navbar-nav .nav-link {
+    color: white !important;
+}
+.navbar-dark .navbar-brand {
+    color: white !important;
+}
+
+.content{
+    margin-bottom:50px;
+    margin-top: 50px;
+    margin-left: 200px;
+    margin-right: 200px;
+}
+
+.footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 15px 0;
+    text-align: center;
+}
+
+.container.my-3 {
+    background-color: #ffffff; /* 콘텐츠 영역 배경색 (예: 흰색) */
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}

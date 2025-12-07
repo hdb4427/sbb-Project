@@ -1,0 +1,79 @@
+####################################
+# Port & Project Name
+####################################
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+spring:
+  application:
+    name: SBB
+
+  # [추가됨] 파일 업로드 용량 설정 (기본 1MB -> 10MB로 증가)
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  devtools:
+    livereload:
+      enabled: true
+      port: 35729
+    restart:
+      enabled: true
+
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      cache:
+        period: 0
+      chain:
+        cache: false
+
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/health_db
+    username: root
+    password: 1111
+
+  ####################################
+  # JPA 설정
+  ####################################
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    show-sql: true          # SQL 출력 여부
+    properties:
+      hibernate:
+        format_sql: true    # SQL 포맷팅 여부
+        dialect: org.hibernate.dialect.MariaDBDialect
+
+  ####################################
+  # Security User 설정
+  ####################################
+  security:
+    user:
+      name: test
+      password: 1111
+      roles: USER
+
+####################################
+# Logging 설정
+####################################
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
+        orm:
+          jdbc:
+            bind: trace

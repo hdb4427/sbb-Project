@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<th:block layout:fragment="css">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .container.my-3 {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+    </style>
+</th:block>
+
+<div layout:fragment="content" class="container my-3">
+    <h2>오늘의 운동/식단 기록</h2>
+
+    <div class="row my-3">
+        <div class="col-6">
+            <a th:href="@{/question/create}" class="btn btn-primary">기록 하기</a>
+        </div>
+        <div class="col-6">
+            <div class="input-group">
+                <input th:type="text" id="search_keyword" class="form-control" th:value="${keyword}">
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col" th:each="question, loop : ${paging}">
+            <div class="card h-100 shadow-sm border-0">
+
+                <div th:if="${question.thumbnail != null}" class="overflow-hidden rounded-top">
+                    <img th:src="${question.thumbnail}" class="card-img-top" alt="인증샷">
+                </div>
+
+                <div th:unless="${question.thumbnail != null}" class="d-flex justify-content-center align-items-center bg-light rounded-top" style="height: 200px; color: #adb5bd;">
+                    <span>📷 사진 없음</span>
+                </div>
+
+                <div class="card-body">
+                    <div class="mb-2">
+                        <span class="badge bg-primary" th:if="${question.category == '운동'}">🏋️ 운동</span>
+                        <span class="badge bg-success" th:if="${question.category == '식단'}">🥗 식단</span>
+                        <span class="badge bg-info" th:if="${question.category == '눈바디'}">👀 눈바디</span>
+                        <span class="badge bg-secondary" th:if="${question.category == null}">기타</span>
+                    </div>
+
+                    <h5 class="card-title text-truncate">
+                        <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.subject}" class="text-decoration-none text-dark fw-bold"></a>
+                        <span class="small text-danger ms-1" th:if="${#lists.size(question.answerList) > 0}"
+                              th:text="${#lists.size(question.answerList)}">
+                      </span>
+                    </h5>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 text-muted small">
+                        <span th:text="${question.recordDate != null ? question.recordDate : #temporals.format(question.created, 'yyyy-MM-dd')}"></span>
+                        <span th:if="${question.author != null}" th:text="${question.author.username}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${!paging.isEmpty()}" class="mt-4">
+        <th:block th:with="startPage=${(paging.number/10) * 10},
+        endPage=(${(paging.totalPages == 0) ? 1 : (startPage + 9 < paging.totalPages ? startPage + 9 : paging.totalPages - 1)})">
+
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${paging.number == 0} ? 'disabled'">
+                    <a class="page-link" href="javascript:void(0)" th:data-page="0">
+                        <span>처음</span>
+                    </a>
+                </li>
+                <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number-1}">
+                        <span>이전</span>
+                    </a>
+                </li>
+                <li th:each="page: ${#numbers.sequence(startPage, endPage)}"
+                    th:classappend="${page == paging.number} ? 'active'" class="page-item">
+                    <a th:text="${page + 1}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>
+                </li>
+                <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number+1}">
+                        <span>다음</span>
+                    </a>
+                </li>
+                <li class="page-item" th:classappend="${paging.number == paging.totalPages-1} ? 'disabled'">
+                    <a class="page-link" href="javascript:void(0)" th:data-page="${paging.totalPages-1}">
+                        <span>마지막</span>
+                    </a>
+                </li>
+            </ul>
+
+        </th:block>
+    </div>
+
+    <form th:action="@{/question/list}" method="get" id="searchForm">
+        <input type="hidden" id="keyword" name="keyword" th:value="${keyword}">
+        <input type="hidden" id="page" name="page" th:value="${paging.number}">
+    </form>
+
+</div>
+
+<script layout:fragment="script" type='text/javascript'>
+    const page_elements = document.getElementsByClassName("page-link");
+    Array.from(page_elements).forEach(function (element) {
+        element.addEventListener('click', function () {
+            document.getElementById('page').value = this.dataset.page;
+            document.getElementById('searchForm').submit();
+        });
+    });
+
+    $("#btn_search").on("click", function () {
+        $("#keyword").val($("#search_keyword").val());
+        $("#page").val(0);
+        $("#searchForm").submit();
+    });
+
+    $("#search_keyword").on("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            $("#btn_search").click();
+        }
+    });
+</script>
+</html>

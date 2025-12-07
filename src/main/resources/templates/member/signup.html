@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<th:block layout:fragment="css">
+    <style>.fieldError { color: #bd2130; }</style>
+</th:block>
+
+<div layout:fragment="content" class="container my-3">
+    <div class="my-3 border-bottom">
+        <div><h4>회원가입</h4></div>
+    </div>
+
+    <form th:action="@{/member/signup}" th:object="${memberDto}" method="post">
+        <div class="mb-3">
+            <label for="username" class="form-label">사용자ID</label>
+            <input type="text" th:field="*{username}" id="username" class="form-control" placeholder="아이디를 입력하세요">
+            <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="fieldError"></p>
+        </div>
+
+        <div class="mb-3">
+            <label for="password1" class="form-label">비밀번호</label>
+            <input type="password" th:field="*{password1}" id="password1" class="form-control">
+            <p th:if="${#fields.hasErrors('password1')}" th:errors="*{password1}" class="fieldError"></p>
+        </div>
+
+        <div class="mb-3">
+            <label for="password2" class="form-label">비밀번호 확인</label>
+            <input type="password" th:field="*{password2}" id="password2" class="form-control">
+            <p th:if="${#fields.hasErrors('password2')}" th:errors="*{password2}" class="fieldError"></p>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">이메일</label>
+            <input type="email" th:field="*{email}" id="email" class="form-control" placeholder="example@email.com">
+            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="fieldError"></p>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label d-block">성별</label>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" th:field="*{gender}" id="genderMale" value="MALE">
+                <label class="form-check-label" for="genderMale">남성</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" th:field="*{gender}" id="genderFemale" value="FEMALE">
+                <label class="form-check-label" for="genderFemale">여성</label>
+            </div>
+            <p th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}" class="fieldError"></p>
+        </div>
+
+        <div class="mb-3">
+            <label for="department" class="form-label">운동 목표</label>
+            <select th:field="*{department}" id="department" class="form-select">
+                <option value="" disabled selected>당신의 운동 목표를 선택하세요</option>
+                <option value="DIET">🔥 다이어트 (체지방 감량)</option>
+                <option value="BULKUP">💪 벌크업 (근육량 증가)</option>
+                <option value="PROFILE">📸 바디프로필 (단기간 집중)</option>
+                <option value="REHAB">🧘 체형교정/재활 (건강 회복)</option>
+                <option value="STAMINA">🏃 체력증진 (생존 운동)</option>
+                <option value="POWERLIFTING">🏋️ 파워리프팅 (3대 중량 증가)</option>
+            </select>
+            <p th:if="${#fields.hasErrors('department')}" th:errors="*{department}" class="fieldError"></p>
+        </div>
+        <div class="mb-3 form-check">
+            <input class="form-check-input" type="checkbox" th:field="*{registration}" id="registration">
+            <label class="form-check-label" for="registration">
+                (선택) 제3자 마케팅 활용 동의
+            </label>
+            <p th:if="${#fields.hasErrors('registration')}" th:errors="*{registration}" class="fieldError"></p>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2">가입하고 운동 시작하기</button>
+    </form>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(function(){
+            let errorMessage = [[${errorMessage}]];
+            if(errorMessage != null){ alert(errorMessage); }
+        });
+    </script>
+</th:block>
+</html>

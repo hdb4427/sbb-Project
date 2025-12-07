@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+
+<div layout:fragment="content" class="container my-3">
+  <h5 class="my-3 border-bottom pb-2">답변 수정</h5>
+  <form th:object="${answerDto}" method="post">
+    <!-- th:action 속성이 없는 경우 csrf 항목 직접 입력 -->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <div class="mb-3">
+      <label for="content" class="form-label">내용</label>
+      <textarea th:field="*{content}" id="content" class="form-control" rows="10"></textarea>
+    </div>
+    <input type="submit" value="저장하기" class="btn btn-primary my-2">
+  </form>
+</div>
+</html>

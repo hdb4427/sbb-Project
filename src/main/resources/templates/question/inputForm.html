@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<th:block layout:fragment="css">
+    <style>
+        .fieldError {
+            color: #bd2130;
+        }
+    </style>
+</th:block>
+
+<div layout:fragment="content" class="container my-3">
+    <h5 class="my-3 border-bottom pb-2">운동/식단 기록 등록</h5>
+
+    <form th:object="${questionForm}" method="post" enctype="multipart/form-data">
+
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <div class="mb-3">
+            <label for="category" class="form-label">기록 유형</label>
+            <select th:field="*{category}" class="form-select" id="category">
+                <option value="">유형을 선택하세요</option>
+                <option value="운동">🏋️ 헬스/운동</option>
+                <option value="식단">🥗 식단(1일 2식)</option>
+                <option value="눈바디">👀 눈바디/체중</option>
+            </select>
+            <p th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="fieldError">Incorrect data</p>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">날짜</label>
+
+            <input type="hidden" id="realRecordDate" th:field="*{recordDate}">
+
+            <div class="d-flex gap-2">
+                <input type="text" id="year" class="form-control" placeholder="년(YYYY)" maxlength="4" style="width: 120px;">
+                <span class="align-self-center fw-bold">-</span>
+
+                <input type="text" id="month" class="form-control" placeholder="월(MM)" maxlength="2" style="width: 80px;">
+                <span class="align-self-center fw-bold">-</span>
+
+                <input type="text" id="day" class="form-control" placeholder="일(DD)" maxlength="2" style="width: 80px;">
+            </div>
+            <p th:if="${#fields.hasErrors('recordDate')}" th:errors="*{recordDate}" class="fieldError">Incorrect data</p>
+        </div>
+
+        <div class="mb-3">
+            <label for="file" class="form-label">인증샷 (선택)</label>
+            <input type="file" class="form-control" id="file" name="file">
+        </div>
+
+        <div class="mb-3">
+            <label for="subject" class="form-label">제목</label>
+            <input type="text" class="form-control" id="subject" th:field="*{subject}" placeholder="제목을 입력하세요" />
+            <p th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}" class="fieldError">Incorrect data</p>
+        </div>
+
+        <div class="mb-3">
+            <label for="content" class="form-label">내용</label>
+            <textarea class="form-control" id="content" th:field="*{content}" rows="10" placeholder="내용을 입력하세요"></textarea>
+            <p th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="fieldError">Incorrect data</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary my-2">저장하기</button>
+    </form>
+</div>
+
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            // 1. 초기 로딩 시 날짜 세팅
+            const existingDate = $("#realRecordDate").val(); // 숨겨진 날짜 값 가져오기
+
+            if(existingDate) {
+                // [수정 모드] 기존 날짜가 있으면 쪼개서 보여주기
+                const parts = existingDate.split('-');
+                if(parts.length === 3) {
+                    $("#year").val(parts[0]);
+                    $("#month").val(parts[1]);
+                    $("#day").val(parts[2]);
+                }
+            } else {
+                // [작성 모드] 날짜가 없으면 '오늘 날짜'로 자동 세팅! (여기 추가됨)
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0'); // 1월이 0부터 시작하므로 +1
+                const dd = String(today.getDate()).padStart(2, '0');
+
+                $("#year").val(yyyy);
+                $("#month").val(mm);
+                $("#day").val(dd);
+
+                // 숨겨진 필드에도 값 넣어주기 (중요!)
+                $("#realRecordDate").val(yyyy + "-" + mm + "-" + dd);
+            }
+
+            // --- 아래는 기존과 동일한 이벤트 리스너들 ---
+
+            // 1. 년도 입력 시 자동 이동
+            $("#year").on("input", function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if(this.value.length >= 4) {
+                    $("#month").focus();
+                }
+                combineDate();
+            });
+
+            // 2. 월 입력 시 자동 이동
+            $("#month").on("input", function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if(this.value.length >= 2) {
+                    $("#day").focus();
+                }
+                combineDate();
+            });
+
+            // 3. 일 입력 시 데이터 합치기
+            $("#day").on("input", function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                combineDate();
+            });
+
+            // 날짜 합쳐서 hidden input에 넣는 함수
+            function combineDate() {
+                const y = $("#year").val();
+                let m = $("#month").val();
+                let d = $("#day").val();
+
+                if(!y || !m || !d) {
+                    $("#realRecordDate").val("");
+                    return;
+                }
+
+                if(m.length === 1) m = "0" + m;
+                if(d.length === 1) d = "0" + d;
+
+                const finalDate = y + "-" + m + "-" + d;
+                $("#realRecordDate").val(finalDate);
+            }
+        });
+    </script>
+</th:block>
+</html>
