@@ -23,7 +23,7 @@
             <select th:field="*{category}" class="form-select" id="category">
                 <option value="">유형을 선택하세요</option>
                 <option value="운동">🏋️ 헬스/운동</option>
-                <option value="식단">🥗 식단(1일 2식)</option>
+                <option value="식단">🥗 식단(건강식)</option>
                 <option value="눈바디">👀 눈바디/체중</option>
             </select>
             <p th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="fieldError">Incorrect data</p>
@@ -83,7 +83,6 @@
                     $("#day").val(parts[2]);
                 }
             } else {
-                // [작성 모드] 날짜가 없으면 '오늘 날짜'로 자동 세팅! (여기 추가됨)
                 const today = new Date();
                 const yyyy = today.getFullYear();
                 const mm = String(today.getMonth() + 1).padStart(2, '0'); // 1월이 0부터 시작하므로 +1
@@ -93,13 +92,9 @@
                 $("#month").val(mm);
                 $("#day").val(dd);
 
-                // 숨겨진 필드에도 값 넣어주기 (중요!)
                 $("#realRecordDate").val(yyyy + "-" + mm + "-" + dd);
             }
 
-            // --- 아래는 기존과 동일한 이벤트 리스너들 ---
-
-            // 1. 년도 입력 시 자동 이동
             $("#year").on("input", function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
                 if(this.value.length >= 4) {
@@ -108,7 +103,7 @@
                 combineDate();
             });
 
-            // 2. 월 입력 시 자동 이동
+
             $("#month").on("input", function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
                 if(this.value.length >= 2) {
@@ -117,13 +112,12 @@
                 combineDate();
             });
 
-            // 3. 일 입력 시 데이터 합치기
+
             $("#day").on("input", function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
                 combineDate();
             });
 
-            // 날짜 합쳐서 hidden input에 넣는 함수
             function combineDate() {
                 const y = $("#year").val();
                 let m = $("#month").val();
