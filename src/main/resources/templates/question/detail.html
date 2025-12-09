@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    <h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(question.answerList)}개의 메모가 있습니다.|"></h5>
+    <h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(question.answerList)}개의 댓글이 있습니다.|"></h5>
 
     <div class="card my-3 bg-info-subtle" th:each="answer : ${question.answerList}">
         <div class="card-body">
@@ -108,14 +108,14 @@
     <form th:action="@{|/answer/create/${question.id}|}" method="post" class="my-3" th:object="${answerDto}">
         <textarea sec:authorize="isAnonymous()" disabled
                   th:field="*{content}"
-                  rows="5" class="form-control" placeholder="로그인 후 메모를 남길 수 있습니다."></textarea>
+                  rows="5" class="form-control" placeholder="로그인 후 댓글을 남길 수 있습니다."></textarea>
 
         <textarea sec:authorize="isAuthenticated()"
                   th:field="*{content}"
-                  rows="5" class="form-control" placeholder="운동 피드백이나 메모를 남겨보세요."></textarea>
+                  rows="5" class="form-control" placeholder="운동 피드백이나 힘이 나는 한마디를 남겨보세요!"></textarea>
 
         <p th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="fieldError">내용을 입력하세요</p>
-        <input type="submit" value="메모 등록" class="btn btn-primary my-2">
+        <input type="submit" value="댓글 등록" class="btn btn-primary my-2">
     </form>
 </div>
 
