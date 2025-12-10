@@ -65,8 +65,6 @@ public class MemberController {
     return "member/login";
   }
 
-  // @PostMapping("/login") 은 스프링이 구현 --> SecurityConfig에 http.formLogin() 수정
-
   @GetMapping(value = "/login/error")
   public String loginError(Model model){
     model.addAttribute("loginErrorMsg", "아이디 또는 비밀번호를 확인해주세요");

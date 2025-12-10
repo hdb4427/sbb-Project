@@ -47,7 +47,7 @@ public class QuestionController {
     public String detail(Model model, @PathVariable("id") Integer id, AnswerDto answerForm) {
         Question question = questionService.getQuestion(id);
         model.addAttribute("question", question);
-        return "question_detail";
+        return "question/detail";
     }
 
     // 질문 등록 폼 이동

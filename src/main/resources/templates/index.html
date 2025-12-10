@@ -1,13 +1,41 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Health Main Page</title>
 
-<div layout:fragment="content" class="container my-3">
-  <div>
-    <h1 class="text-center">SBB 페이지</h1>
-    <div class="text-center my-3"> <img th:src="@{/images/background.jpg}" alt="SBB 배경" class="img-fluid" style="height: 700px; width: auto;">
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <script src="/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div th:replace="~{/fragments/nav :: nav}"></div>
+
+<div class="container mt-4">
+  <div class="row g-3">
+    <div class="col">
+      <div class="p-3 border rounded shadow-sm" style="min-height : 500px;">
+        <a th:href="@{/question/list}">헬스 게시판</a>
+      </div>
+    </div>
+    <div class="col">
+      <div class="p-3 border rounded shadow-sm" style="min-height : 500px;">
+        <a th:href="@{/question/list}">식단 게시판</a>
+      </div>
+    </div>
+    <div class="col">
+      <div class="p-3 border rounded shadow-sm" style="min-height : 500px;">
+        <a th:href="@{/question/list}">눈바디 게시판</a>
+      </div>
+    </div>
   </div>
 
+  <div class="row g-3">
+    <div class="col">
+      <div class="p-3 border rounded shadow-sm mt-3 mb-3" style="min-height : 500px;">
+        <a th:href="@{/question/list}">자유 게시판</a>
+      </div>
+    </div>
+  </div>
 </div>
+</body>
 </html>
