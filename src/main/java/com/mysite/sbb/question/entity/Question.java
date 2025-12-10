@@ -1,6 +1,7 @@
 package com.mysite.sbb.question.entity;
 
 import com.mysite.sbb.answer.entity.Answer;
+import com.mysite.sbb.audit.BaseEntity; // 👈 이 import가 있어야 합니다.
 import com.mysite.sbb.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,11 +15,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Question {
+// 👇 여기에 extends BaseEntity가 꼭 있어야 'created' 필드를 인식합니다!
+public class Question extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // Integer로 변경
+    private Integer id;
 
     @Column(length = 200)
     private String subject;
@@ -26,21 +28,16 @@ public class Question {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private LocalDate createDate;
-
     private String category;
 
     private LocalDate recordDate;
 
-    // 작성자 (Member 객체와 연결)
     @ManyToOne
     private Member author;
 
-    // 답변 리스트 (1:N 관계)
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     private List<Answer> answerList;
 
-    // Base64 이미지는 길이가 매우 길 수 있으므로 TEXT 타입 지정
     @Column(columnDefinition = "LONGTEXT")
     private String thumbnail;
 }

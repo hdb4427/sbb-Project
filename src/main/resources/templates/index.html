@@ -12,27 +12,74 @@
 
 <div class="container mt-4">
   <div class="row g-3">
-    <div class="col">
-      <div class="p-3 border rounded shadow-sm" style="min-height : 500px;">
-        <a th:href="@{/question/list}">헬스 게시판</a>
+
+    <div class="col-md-4">
+      <div class="p-3 border rounded shadow-sm h-100" style="min-height: 500px; background-color: #fff;">
+        <h4 class="border-bottom pb-2 mb-3">
+          <a th:href="@{/question/list(category='운동')}" class="text-decoration-none text-primary fw-bold">🏋️ 헬스 게시판</a>
+        </h4>
+        <ul class="list-group list-group-flush">
+          <li th:each="question : ${healthList}" class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+            <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.subject}" class="text-dark text-decoration-none text-truncate" style="max-width: 70%;">제목</a>
+            <span class="text-muted small" th:text="${#temporals.format(question.created, 'MM-dd')}">날짜</span>
+          </li>
+          <li th:if="${#lists.isEmpty(healthList)}" class="list-group-item text-muted text-center border-0 mt-5">
+            아직 등록된 글이 없습니다.
+          </li>
+        </ul>
       </div>
     </div>
-    <div class="col">
-      <div class="p-3 border rounded shadow-sm" style="min-height : 500px;">
-        <a th:href="@{/question/list}">식단 게시판</a>
+
+    <div class="col-md-4">
+      <div class="p-3 border rounded shadow-sm h-100" style="min-height: 500px; background-color: #fff;">
+        <h4 class="border-bottom pb-2 mb-3">
+          <a th:href="@{/question/list(category='식단')}" class="text-decoration-none text-success fw-bold">🥗 식단 게시판</a>
+        </h4>
+        <ul class="list-group list-group-flush">
+          <li th:each="question : ${dietList}" class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+            <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.subject}" class="text-dark text-decoration-none text-truncate" style="max-width: 70%;">제목</a>
+            <span class="text-muted small" th:text="${#temporals.format(question.created, 'MM-dd')}">날짜</span>
+          </li>
+          <li th:if="${#lists.isEmpty(dietList)}" class="list-group-item text-muted text-center border-0 mt-5">
+            아직 등록된 글이 없습니다.
+          </li>
+        </ul>
       </div>
     </div>
-    <div class="col">
-      <div class="p-3 border rounded shadow-sm" style="min-height : 500px;">
-        <a th:href="@{/question/list}">눈바디 게시판</a>
+
+    <div class="col-md-4">
+      <div class="p-3 border rounded shadow-sm h-100" style="min-height: 500px; background-color: #fff;">
+        <h4 class="border-bottom pb-2 mb-3">
+          <a th:href="@{/question/list(category='눈바디')}" class="text-decoration-none text-info fw-bold">👀 눈바디 게시판</a>
+        </h4>
+        <ul class="list-group list-group-flush">
+          <li th:each="question : ${eyeBodyList}" class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+            <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.subject}" class="text-dark text-decoration-none text-truncate" style="max-width: 70%;">제목</a>
+            <span class="text-muted small" th:text="${#temporals.format(question.created, 'MM-dd')}">날짜</span>
+          </li>
+          <li th:if="${#lists.isEmpty(eyeBodyList)}" class="list-group-item text-muted text-center border-0 mt-5">
+            아직 등록된 글이 없습니다.
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 
-  <div class="row g-3">
+  <div class="row g-3 mt-1">
     <div class="col">
-      <div class="p-3 border rounded shadow-sm mt-3 mb-3" style="min-height : 500px;">
-        <a th:href="@{/question/list}">자유 게시판</a>
+      <div class="p-3 border rounded shadow-sm mb-4" style="min-height: 300px; background-color: #fff;">
+        <h4 class="border-bottom pb-2 mb-3">
+          <a th:href="@{/question/list(category='자유')}" class="text-decoration-none text-secondary fw-bold">🗣️ 자유 게시판</a>
+        </h4>
+        <ul class="list-group list-group-flush">
+          <li th:each="question : ${freeList}" class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+            <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.subject}" class="text-dark text-decoration-none text-truncate" style="max-width: 80%;">제목</a>
+            <span class="text-muted small" th:text="${#temporals.format(question.created, 'MM-dd HH:mm')}">날짜</span>
+          </li>
+          <li th:if="${#lists.isEmpty(freeList)}" class="list-group-item text-muted text-center border-0 mt-4">
+            아직 등록된 글이 없습니다.
+          </li>
+        </ul>
       </div>
     </div>
   </div>

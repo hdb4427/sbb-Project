@@ -30,15 +30,19 @@ public class QuestionController {
     private final QuestionService questionService;
     private final MemberService memberService;
 
-    // 질문 목록
     @GetMapping("/list")
     public String list(Model model,
                        @RequestParam(value = "page", defaultValue = "0") int page,
-                       @RequestParam(value = "kw", defaultValue = "") String kw) {
+                       @RequestParam(value = "kw", defaultValue = "") String kw,
+                       @RequestParam(value = "category", defaultValue = "") String category) { // ✅ 추가
 
-        Page<Question> paging = this.questionService.getList(page, kw);
+        // 서비스에 category 전달
+        Page<Question> paging = this.questionService.getList(page, kw, category);
+
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
+        model.addAttribute("category", category); // ✅ HTML에서 현재 카테고리를 알 수 있게 전달
+
         return "question/list";
     }
 
