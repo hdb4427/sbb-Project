@@ -1,6 +1,8 @@
 package com.mysite.sbb.member.controller;
 
 import com.mysite.sbb.member.dto.MemberDto;
+import com.mysite.sbb.member.dto.MemberModifyForm;
+import com.mysite.sbb.member.entity.Member;
 import com.mysite.sbb.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -17,6 +20,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.security.Principal;
 
 @Slf4j
 @Controller
@@ -57,7 +62,7 @@ public class MemberController {
       return "member/signup";
     }
 
-    return "redirect:/";
+    return "redirect:/member/login";
   }
 
   @GetMapping("/login")
@@ -80,4 +85,38 @@ public class MemberController {
     }
     return "redirect:/";
   }
-}
+
+    @PreAuthorize("isAuthenticated()") // 로그인 한 사람만 접근 가능
+    @GetMapping("/setting")
+    public String setting(MemberModifyForm memberModifyForm, Principal principal) {
+      // 1. 현재 로그인한 사용자 정보를 가져옴
+      Member member = memberService.getMember(principal.getName());
+
+      // 2. 폼에 기존 정보를 채워서 화면으로 보냄
+      memberModifyForm.setName(member.getName());
+      memberModifyForm.setEmail(member.getEmail());
+      memberModifyForm.setDepartment(member.getDepartment().name()); // Enum -> String
+
+      return "member/setting";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/setting")
+    public String setting(@Valid MemberModifyForm memberModifyForm,
+                          BindingResult bindingResult,
+                          Principal principal) {
+
+      if (bindingResult.hasErrors()) {
+        return "member/setting";
+      }
+
+      Member member = memberService.getMember(principal.getName());
+
+      memberService.modify(member,
+              memberModifyForm.getName(),
+              memberModifyForm.getEmail(),
+              memberModifyForm.getDepartment());
+
+      return "redirect:/"; // 수정 후 메인으로 이동
+    }
+  }

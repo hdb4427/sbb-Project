@@ -52,4 +52,15 @@ public class MemberService {
                 .orElseThrow(() ->
                         new EntityNotFoundException("해당 사용자를 찾을 수 없습니다 : " + username));
     }
+
+    public void modify(Member member, String name, String email, String departmentStr) {
+        member.setName(name);
+        member.setEmail(email);
+
+        // 문자를 Enum으로 변환 (운동 -> DIET 등)
+        Department department = Department.valueOf(departmentStr);
+        member.setDepartment(department);
+
+        memberRepository.save(member);
+    }
 }

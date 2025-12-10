@@ -8,7 +8,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav nav-underline">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <a class="nav-link active" aria-current="page" href="/">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link disabled" href="#">개발중</a>
@@ -19,9 +19,9 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="/question/list">자유게시판</a></li>
-                        <li><a class="dropdown-item" href="/question/list">헬스게시판</a></li>
-                        <li><a class="dropdown-item" href="/question/list">식단게시판</a></li>
-                        <li><a class="dropdown-item" href="/question/list">눈바디게시판</a></li>
+                        <li><a class="dropdown-item" href="/question/list?category=운동">헬스게시판</a></li>
+                        <li><a class="dropdown-item" href="/question/list?category=식단">식단게시판</a></li>
+                        <li><a class="dropdown-item" href="/question/list?category=눈바디">눈바디게시판</a></li>
                     </ul>
                 </li>
             </ul>
@@ -45,16 +45,16 @@
 
                                 <div class="d-flex justify-content-between align-items-center">
                                     <strong th:text="${userName + '님'}">유저이름</strong>
-                                    <a href="/logout" class="btn btn-sm btn-outline-secondary">로그아웃</a>
+                                    <a href="/member/logout" class="btn btn-sm btn-outline-secondary">로그아웃</a>
                                 </div>
 
-                                <div class="small text-muted" th:text="${userName}">cmj10301@naver.com</div>
+                                <div class="small text-muted" th:text="${email}"></div>
                             </div>
 
                         </div>
 
                         <div class="border-top mt-2 d-flex text-center small">
-                            <a href="/setting"
+                            <a href="/member/setting"
                                class="flex-fill text-decoration-none text-secondary border-end py-2">
                                 프로필 설정
                             </a>
