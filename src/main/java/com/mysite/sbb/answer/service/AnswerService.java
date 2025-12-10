@@ -9,7 +9,7 @@ import com.mysite.sbb.question.entity.Question;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+// import java.time.LocalDateTime; // ❌ 날짜 관련 import 삭제 (자동 처리됨)
 
 @Service
 @RequiredArgsConstructor
@@ -21,15 +21,14 @@ public class AnswerService {
 
         Answer answer = Answer.builder()
                 .content(dto.getContent())
-                .author(author)       // Member 객체
-                .question(question)   // Question 객체
-                .createDate(LocalDateTime.now())
+                .author(author)
+                .question(question)
+                // .createDate(LocalDateTime.now()) ❌ 삭제 (BaseEntity가 자동 처리)
                 .build();
 
         return answerRespository.save(answer);
     }
 
-    // ID 타입 String -> Integer
     public Answer getAnswer(Integer id) {
         return answerRespository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("answer not found"));
@@ -37,7 +36,7 @@ public class AnswerService {
 
     public void modify(Answer answer, String content) {
         answer.setContent(content);
-        answer.setModifyDate(LocalDateTime.now());
+        // answer.setModifyDate(LocalDateTime.now()); ❌ 삭제 (BaseEntity가 자동 처리)
         answerRespository.save(answer);
     }
 

@@ -1,19 +1,19 @@
 package com.mysite.sbb.answer.entity;
 
+import com.mysite.sbb.audit.BaseEntity; // ✅ 이 import 필수!
 import com.mysite.sbb.member.entity.Member;
 import com.mysite.sbb.question.entity.Question;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
-@Entity // 변경
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Answer {
+// 👇 여기에 extends BaseEntity가 반드시 있어야 'created'를 인식합니다.
+public class Answer extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +21,6 @@ public class Answer {
 
     @Column(columnDefinition = "TEXT")
     private String content;
-
-    private LocalDateTime createDate;
-
-    private LocalDateTime modifyDate;
 
     @ManyToOne
     private Question question;

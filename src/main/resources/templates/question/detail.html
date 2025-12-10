@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
@@ -6,117 +6,215 @@
 
 <th:block layout:fragment="css">
     <style>
-        .fieldError {
-            color: #bd2130;
+        /* 카테고리 & 타이틀 */
+        .blog-category {
             font-size: 0.9rem;
-            margin-top: 5px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
+        .blog-subject {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 15px;
+        }
+
+        /* 작성자 프로필 영역 (구분선 있음) */
+        .blog-meta {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .blog-author-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 1px solid #eee;
+        }
+        .blog-info {
+            font-size: 0.9rem;
+        }
+        .blog-author-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .blog-date {
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        /* 본문 영역 (배경색 있음, 그림자 없음) */
+        .blog-content-box {
+            background-color: #fcfcfc; /* 아주 연한 회색 */
+            padding: 40px;
+            border-radius: 15px;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #333;
+            min-height: 200px;
+            margin-bottom: 50px;
+            border: 1px solid #f1f1f1; /* 테두리 아주 살짝 */
+        }
+        .blog-content-box img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        /* 댓글 영역 (배경색 있음, 그림자 없음) */
+        .comment-section {
+            background-color: #f8f9fa; /* 댓글 영역 배경 */
+            padding: 30px;
+            border-radius: 15px;
+        }
+        .comment-header {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .comment-item {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .comment-item:last-child { border-bottom: none; }
+
+        .comment-img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .comment-body {
+            flex-grow: 1;
+        }
+        .comment-author {
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+        .comment-text {
+            font-size: 0.95rem;
+            color: #444;
+            white-space: pre-line;
+            margin-bottom: 5px;
+        }
+        .comment-date {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        /* 버튼 스타일 (심플한 텍스트 링크로 복귀) */
+        .btn-text {
+            text-decoration: none;
+            color: #777;
+            font-size: 0.85rem;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .btn-text:hover { color: #333; text-decoration: underline; }
+        .text-danger:hover { color: #ff0000 !important; }
     </style>
 </th:block>
 
-<div layout:fragment="content" class="container my-3">
-    <h2 class="border-bottom py-2">
-        <span class="badge bg-primary fs-6 align-middle me-2" th:if="${question.category == '운동'}">운동</span>
-        <span class="badge bg-success fs-6 align-middle me-2" th:if="${question.category == '식단'}">식단</span>
-        <span class="badge bg-info fs-6 align-middle me-2" th:if="${question.category == '눈바디'}">눈바디</span>
+<div layout:fragment="content" class="container my-4" style="max-width: 900px;">
 
-        <span th:text="${question.subject}"></span>
-    </h2>
+    <div class="mb-3">
+        <div class="blog-category">
+            <span class="text-primary" th:if="${question.category == '운동'}">🏋️ 헬스</span>
+            <span class="text-success" th:if="${question.category == '식단'}">🥗 식단</span>
+            <span class="text-info" th:if="${question.category == '눈바디'}">👀 눈바디</span>
+            <span class="text-secondary" th:if="${question.category == '자유'}">🗣️ 자유</span>
+        </div>
 
-    <div class="card my-3 bg-warning-subtle">
-        <div class="card-body">
+        <h1 class="blog-subject" th:text="${question.subject}">제목입니다.</h1>
 
-            <div th:if="${question.thumbnail != null}" class="mb-4 text-center">
-                <img th:src="@{${question.thumbnail}}" class="img-fluid rounded shadow-sm" alt="인증샷" style="max-height: 500px;">
-            </div>
+        <div class="blog-meta">
+            <img th:src="${question.author?.profileImage ?: '/images/default.png'}"
+                 class="blog-author-img" alt="프로필">
 
-            <div class="card-text" style="white-space: pre-line;" th:text="${question.content}"></div>
-
-            <div class="d-flex justify-content-end">
-                <div th:if="${question.updated != null}" class="badge bg-light text-dark p-2 text-start mx-3">
-                    <div class="mb-2">수정일 :</div>
-                    <div th:text="${#temporals.format(question.updated, 'yyyy-MM-dd HH:mm')}"></div>
-                </div>
-
-                <div class="badge bg-warning text-dark p-2 text-start mx-3">
-                    <div class="mb-2">
-                        <span th:if="${question.author != null}" th:text="${question.author.username}"></span>
-                    </div>
-                    <div th:text="${#temporals.format(question.created, 'yyyy-MM-dd HH:mm')}"></div>
-
-                    <div class="mt-2 border-top border-dark pt-1" th:if="${question.recordDate != null}">
-                        <span>📅 운동일 : </span>
-                        <span th:text="${question.recordDate}" class="fw-bold"></span>
-                    </div>
+            <div class="blog-info">
+                <div class="blog-author-name" th:text="${question.author?.username}">작성자</div>
+                <div class="blog-date">
+                    <span th:text="${#temporals.format(question.created, 'yyyy.MM.dd. HH:mm')}"></span>
                 </div>
             </div>
 
-            <div class="my-3">
-                <a th:href="@{|/question/modify/${question.id}|}"
-                   class="btn btn-sm btn-outline-primary"
-                   sec:authorize="isAuthenticated()"
-                   th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
-                   th:text="수정">수정
-                </a>
+            <div class="ms-auto"
+                 sec:authorize="isAuthenticated()"
+                 th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}">
+                <a th:href="@{|/question/modify/${question.id}|}" class="btn-text">수정</a>
                 <a href="javascript:void(0);"
                    th:data-uri="@{|/question/delete/${question.id}|}"
-                   class="delete btn btn-sm btn-outline-danger"
-                   sec:authorize="isAuthenticated()"
-                   th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
-                   th:text="삭제">삭제
-                </a>
+                   class="delete btn-text text-danger">삭제</a>
             </div>
         </div>
     </div>
 
-    <h5 class="border-bottom my-3 py-2" th:text="|${#lists.size(question.answerList)}개의 댓글이 있습니다.|"></h5>
+    <div class="blog-content-box">
+        <div th:if="${question.thumbnail != null}" class="text-center">
+            <img th:src="@{${question.thumbnail}}" alt="첨부 이미지">
+        </div>
 
-    <div class="card my-3 bg-info-subtle" th:each="answer : ${question.answerList}">
-        <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;" th:text="${answer.content}">답변 내용</div>
-            <div class="d-flex justify-content-end">
-                <div th:if="${answer.updated != null}" class="badge bg-light text-dark p-2 text-start mx-3">
-                    <div class="mb-2">수정일 :</div>
-                    <div th:text="${#temporals.format(answer.updated, 'yyyy-MM-dd HH:mm')}"></div>
-                </div>
+        <div th:text="${question.content}">내용</div>
+    </div>
 
-                <div class="badge bg-info text-dark p-2 text-start mx-3">
-                    <div class="mb-2">
-                        <span th:if="${answer.author != null}" th:text="${answer.author.username}"></span>
+    <div class="comment-section">
+        <div class="comment-header">
+            댓글 <span class="text-success" th:text="${#lists.size(question.answerList)}">0</span>
+        </div>
+
+        <div class="comment-list">
+            <div th:each="answer : ${question.answerList}" class="comment-item">
+                <img th:src="${answer.author?.profileImage ?: '/images/default.png'}"
+                     class="comment-img" alt="프사">
+
+                <div class="comment-body">
+                    <div class="d-flex justify-content-between">
+                        <span class="comment-author" th:text="${answer.author?.username}">작성자</span>
+
+                        <div sec:authorize="isAuthenticated()"
+                             th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}">
+                            <a th:href="@{|/answer/modify/${answer.id}|}" class="btn-text" style="font-size: 0.8rem;">수정</a>
+                            <a href="javascript:void(0);"
+                               th:data-uri="@{|/answer/delete/${answer.id}|}"
+                               class="delete btn-text text-danger" style="font-size: 0.8rem;">삭제</a>
+                        </div>
                     </div>
-                    <div th:text="${#temporals.format(answer.created, 'yyyy-MM-dd HH:mm')}"></div>
+
+                    <div class="comment-text" th:text="${answer.content}">댓글 내용</div>
+
+                    <div class="comment-date">
+                        <span th:text="${#temporals.format(answer.created, 'yyyy.MM.dd. HH:mm')}"></span>
+                        <span th:if="${answer.updated != null}">(수정됨)</span>
+                    </div>
                 </div>
             </div>
-
-            <div class="my-3">
-                <a th:href="@{|/answer/modify/${answer.id}|}"
-                   class="btn btn-sm btn-outline-secondary"
-                   sec:authorize="isAuthenticated()"
-                   th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
-                   th:text="수정"></a>
-                <a href="javascript:void(0);"
-                   th:data-uri="@{|/answer/delete/${answer.id}|}"
-                   class="delete btn btn-sm btn-outline-secondary"
-                   sec:authorize="isAuthenticated()"
-                   th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
-                   th:text="삭제">
-                </a>
-            </div>
         </div>
+
+        <form th:action="@{|/answer/create/${question.id}|}" method="post" class="mt-4" th:object="${answerDto}">
+            <textarea sec:authorize="isAnonymous()" disabled
+                      th:field="*{content}"
+                      rows="3" class="form-control" placeholder="로그인이 필요합니다."></textarea>
+
+            <textarea sec:authorize="isAuthenticated()"
+                      th:field="*{content}"
+                      rows="3" class="form-control" placeholder="댓글을 입력하세요..."></textarea>
+
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <p th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="fieldError mb-0">내용을 입력하세요</p>
+                <div th:unless="${#fields.hasErrors('content')}"></div>
+                <button type="submit" class="btn btn-dark btn-sm px-4">등록</button>
+            </div>
+        </form>
     </div>
-
-    <form th:action="@{|/answer/create/${question.id}|}" method="post" class="my-3" th:object="${answerDto}">
-        <textarea sec:authorize="isAnonymous()" disabled
-                  th:field="*{content}"
-                  rows="5" class="form-control" placeholder="로그인 후 댓글을 남길 수 있습니다."></textarea>
-
-        <textarea sec:authorize="isAuthenticated()"
-                  th:field="*{content}"
-                  rows="5" class="form-control" placeholder="운동 피드백이나 힘이 나는 한마디를 남겨보세요!"></textarea>
-
-        <p th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="fieldError">내용을 입력하세요</p>
-        <input type="submit" value="댓글 등록" class="btn btn-primary my-2">
-    </form>
 </div>
 
 <th:block layout:fragment="script">
