@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile; // 추가
 
 @Getter
 @Setter
@@ -18,4 +19,6 @@ public class MemberModifyForm {
 
     @NotEmpty(message = "운동 목표를 선택해주세요.")
     private String department;
+
+    private MultipartFile file;
 }

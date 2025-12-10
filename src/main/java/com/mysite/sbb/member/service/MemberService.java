@@ -10,6 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile; // ✅ 필수 추가
+
+import javax.imageio.ImageIO; // ✅ 필수 추가
+import java.awt.*;            // ✅ 필수 추가
+import java.awt.image.BufferedImage; // ✅ 필수 추가
+import java.io.ByteArrayOutputStream; // ✅ 필수 추가
+import java.io.IOException;   // ✅ 필수 추가
+import java.util.Base64;      // ✅ 필수 추가
 
 @Service
 @Validated
@@ -21,16 +29,11 @@ public class MemberService {
 
     // 회원 가입
     public void create(@Valid MemberDto memberDto) {
-
-        // (선택) 비밀번호 체크 - 보통은 컨트롤러/Validator에서 처리하지만 여기서도 한 번 막을 수 있음
         if (!memberDto.getPassword1().equals(memberDto.getPassword2())) {
             throw new IllegalArgumentException("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
 
-        // department 문자열 → Enum 변환
-        // ⚠️ HTML <option value="DIET"> 처럼 Enum 이름과 동일한 값을 보내야 합니다.
         Department department = Department.valueOf(memberDto.getDepartment());
-
         String encodedPassword = passwordEncoder.encode(memberDto.getPassword1());
 
         Member member = Member.builder()
@@ -53,14 +56,50 @@ public class MemberService {
                         new EntityNotFoundException("해당 사용자를 찾을 수 없습니다 : " + username));
     }
 
-    public void modify(Member member, String name, String email, String departmentStr) {
+    // 회원 정보 수정
+    public void modify(Member member, String name, String email, String departmentStr, MultipartFile file) throws IOException {
         member.setName(name);
         member.setEmail(email);
 
-        // 문자를 Enum으로 변환 (운동 -> DIET 등)
         Department department = Department.valueOf(departmentStr);
         member.setDepartment(department);
 
+        // ✅ 프로필 사진 변경 로직
+        if (file != null && !file.isEmpty()) {
+            String imageString = resizeImage(file, 200);
+            member.setProfileImage(imageString);
+        }
+
         memberRepository.save(member);
+    }
+
+    // ✅ 이미지 리사이징 유틸 메서드
+    private String resizeImage(MultipartFile file, int targetWidth) throws IOException {
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+        if (originalImage == null) return null;
+
+        int originalWidth = originalImage.getWidth();
+        int originalHeight = originalImage.getHeight();
+        int targetHeight = (int) (originalHeight * ((double) targetWidth / originalWidth));
+
+        if (originalWidth < targetWidth) {
+            targetWidth = originalWidth;
+            targetHeight = originalHeight;
+        }
+
+        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = resizedImage.createGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        graphics.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        graphics.dispose();
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        String formatName = "jpg";
+        if (file.getContentType() != null && file.getContentType().contains("png")) {
+            formatName = "png";
+        }
+        ImageIO.write(resizedImage, formatName, os);
+        String base64 = Base64.getEncoder().encodeToString(os.toByteArray());
+        return "data:image/" + formatName + ";base64," + base64;
     }
 }

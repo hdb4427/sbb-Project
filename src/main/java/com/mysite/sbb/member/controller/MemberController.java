@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.IOException;
 import java.security.Principal;
 
 @Slf4j
@@ -104,7 +105,7 @@ public class MemberController {
     @PostMapping("/setting")
     public String setting(@Valid MemberModifyForm memberModifyForm,
                           BindingResult bindingResult,
-                          Principal principal) {
+                          Principal principal) throws IOException { // Exception 추가 필요
 
       if (bindingResult.hasErrors()) {
         return "member/setting";
@@ -112,11 +113,13 @@ public class MemberController {
 
       Member member = memberService.getMember(principal.getName());
 
+      // ✅ memberModifyForm.getFile()을 추가로 전달
       memberService.modify(member,
               memberModifyForm.getName(),
               memberModifyForm.getEmail(),
-              memberModifyForm.getDepartment());
+              memberModifyForm.getDepartment(),
+              memberModifyForm.getFile()); // 여기서 파일 전달
 
-      return "redirect:/"; // 수정 후 메인으로 이동
+      return "redirect:/";
     }
   }

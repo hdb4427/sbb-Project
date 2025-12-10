@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import java.security.Principal;
 
 @RequiredArgsConstructor
-@ControllerAdvice // 모든 컨트롤러 전역에서 동작
+@ControllerAdvice
 public class GlobalControllerAdvice {
 
     private final MemberService memberService;
@@ -20,14 +20,18 @@ public class GlobalControllerAdvice {
         if (principal != null) {
             Member member = memberService.getMember(principal.getName());
 
+            // 1. 이름 결정
             String displayName = (member.getName() != null) ? member.getName() : member.getUsername();
 
-            String profileImage = "/images/default_profile.png";
+            String profileImage = member.getProfileImage();
+
+            if (profileImage == null || profileImage.isEmpty()) {
+                profileImage = "/images/default.png";
+            }
+
             model.addAttribute("userName", displayName);
-            model.addAttribute("userImage", profileImage);
-        } else {
-            // 로그인하지 않은 경우 (null 처리는 HTML th:if에서 하므로 여기선 생략 가능)
-            model.addAttribute("userName", null);
+            model.addAttribute("userImage", profileImage); // 이제 여기엔 절대 null이 안 들어감
+            model.addAttribute("email", member.getEmail()); // 이메일도 추가 (nav에 쓰임)
         }
     }
 }

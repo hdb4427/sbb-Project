@@ -35,4 +35,8 @@ public class Member extends BaseEntity {
     private Department department;
 
     private Boolean registration;
+
+    // ✅ [추가] 프로필 이미지 (Base64 저장용)
+    @Column(columnDefinition = "LONGTEXT")
+    private String profileImage;
 }
