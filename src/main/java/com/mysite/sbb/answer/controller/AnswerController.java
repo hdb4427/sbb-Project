@@ -26,78 +26,88 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class AnswerController {
 
-  private final QuestionService questionService;
-  private final AnswerService answerService;
+    private final AnswerService answerService;
+    private final QuestionService questionService;
+    private final MemberService memberService;
 
-  // 사용자 정보 추가
-  private final MemberService memberService;
+    // 답변 작성 (질문 ID: String -> Integer)
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/create/{id}")
+    public String createAnswer(
+            Model model,
+            @PathVariable("id") Integer id,
+            @Valid AnswerDto answerDto,
+            BindingResult bindingResult,
+            Principal principal
+    ) {
 
-  @PreAuthorize("isAuthenticated()") // 로그인한 사용자만 접근 가능
-  @PostMapping("/create/{id}")
-  public String createAnswer(@PathVariable("id") Long id,
-                             @Valid AnswerDto answerDto,
-                             BindingResult bindingResult,
-                             Principal principal, // 현재 로그인한 사용자 정보(추가)
-                             Model model ) {
+        Question question = questionService.getQuestion(id);
 
-    Question question = questionService.getQuestion(id);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("question", question);
+            return "question_detail";
+        }
 
-    Member member = memberService.getMember(principal.getName()); // 현재 로그인한 사용자의 Member 엔티티 조회
+        Member author = memberService.getMember(principal.getName());
 
+        answerService.create(question, answerDto, author);
 
-    if(bindingResult.hasErrors()) {
-      model.addAttribute("question", question);
-      model.addAttribute("answerDto", answerDto);
-      return "question/detail";
+        return "redirect:/question/detail/" + id;
     }
 
-    log.info("====== question : {}, answerDto: {}, member : {}", id, answerDto, member);
-    answerService.create(question, answerDto, member); // 답변 작성자 정보 전달(추가)
+    // 답변 수정 (답변 ID: String -> Integer)
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/modify/{id}")
+    public String modifyAnswerForm(@PathVariable("id") Integer id, AnswerDto answerDto, Principal principal) {
 
-    return "redirect:/question/detail/" + id;
-  }
+        Answer answer = answerService.getAnswer(id);
 
-  @PreAuthorize("isAuthenticated()") // 로그인한 사용자만 접근 가능
-  @GetMapping("/modify/{id}")
-  public String modifyAnswer(@PathVariable("id") Long id,
-                             @ModelAttribute("answerDto") AnswerDto answerDto, // 폼에 자동 전달할 DTO
-                             Principal principal) { // 현재 로그인한 사용자 정보
+        if (!answer.getAuthor().getUsername().equals(principal.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
+        }
 
-    Answer answer = answerService.getAnswer(id);
-    if (!answer.getAuthor().getUsername().equals(principal.getName())) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "수정 권한이 없습니다.");
-    }
-    answerDto.setContent(answer.getContent());
-    // model.addAttribute("answerFormDto", answerFormDto); // 이전에는 이렇게 처리했지만 지금은 저 값을 자동으로 전달
-    return "answer/modifyForm"; // 답변 수정 폼으로 이동
-  }
+        answerDto.setContent(answer.getContent());
 
-  @PreAuthorize("isAuthenticated()") // 로그인한 사용자만 접근 가능
-  @PostMapping("/modify/{id}")
-  public String modifyAnswer(@PathVariable("id") Long id,
-                             @Valid AnswerDto answerDto, // 폼에 자동 전달할 DTO
-                             BindingResult bindingResult,
-                             Principal principal) { // 현재 로그인한 사용자 정보
-
-    Answer answer = answerService.getAnswer(id);
-    if(!answer.getAuthor().getUsername().equals(principal.getName())) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "수정 권한이 없습니다.");
-    }
-    answerService.modify(answer, answerDto.getContent());
-    return "redirect:/question/detail/" +  answer.getQuestion().getId();
-  }
-
-  @PreAuthorize("isAuthenticated()") // 로그인한 사용자만 접근 가능
-  @GetMapping("/delete/{id}")
-  public String deleteAnswer(@PathVariable("id") Long id, Principal principal) {
-    Answer answer = answerService.getAnswer(id);
-
-    if (!answer.getAuthor().getUsername().equals(principal.getName())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
+        return "answer_form";
     }
 
-    answerService.delete(answer);
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modify/{id}")
+    public String modifyAnswer(
+            @PathVariable("id") Integer id,
+            @Valid AnswerDto answerDto,
+            BindingResult bindingResult,
+            Principal principal
+    ) {
 
-    return "redirect:/question/detail/" + answer.getQuestion().getId();
-  }
+        if (bindingResult.hasErrors()) {
+            return "answer_form";
+        }
+
+        Answer answer = answerService.getAnswer(id);
+
+        if (!answer.getAuthor().getUsername().equals(principal.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
+        }
+
+        answerService.modify(answer, answerDto.getContent());
+
+        return "redirect:/question/detail/" + answer.getQuestion().getId();
+    }
+
+    // 답변 삭제 (답변 ID: String -> Integer)
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/delete/{id}")
+    public String deleteAnswer(@PathVariable("id") Integer id, Principal principal) {
+
+        Answer answer = answerService.getAnswer(id);
+
+        if (!answer.getAuthor().getUsername().equals(principal.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제 권한이 없습니다.");
+        }
+
+        answerService.delete(answer);
+
+        return "redirect:/question/detail/" + answer.getQuestion().getId();
+    }
 }

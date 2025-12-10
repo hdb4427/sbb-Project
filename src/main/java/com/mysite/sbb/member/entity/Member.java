@@ -6,40 +6,33 @@ import com.mysite.sbb.member.constant.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
 @Getter
 @Setter
-@ToString
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Member extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "member_id")
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Column(unique = true, nullable = false)
-  private String username;                // 이름
+    @Column(unique = true)
+    private String username;
 
-  private String password;                // 비밀번호
+    private String password;
 
-  @Column(unique = true, nullable = false)
-  private String email;                   // 이메일
+    @Column(unique = true)
+    private String email;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 20)
-  private Gender gender;                  // 성별
+    private String name;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 30)
-  private Department department;          // 학과
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
-  @Column(nullable = false)
-  private Boolean registration;           // 등록 확인
+    @Enumerated(EnumType.STRING)
+    private Department department;
 
-//  @CreatedDate
-//  private LocalDateTime created;          // 생성일
-
+    private Boolean registration;
 }

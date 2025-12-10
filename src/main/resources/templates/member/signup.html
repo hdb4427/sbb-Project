@@ -20,6 +20,12 @@
         </div>
 
         <div class="mb-3">
+            <label for="name" class="form-label">이름</label>
+            <input type="text" th:field="*{name}" id="name" class="form-control" placeholder="아이디를 입력하세요">
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="fieldError"></p>
+        </div>
+
+        <div class="mb-3">
             <label for="password1" class="form-label">비밀번호</label>
             <input type="password" th:field="*{password1}" id="password1" class="form-control">
             <p th:if="${#fields.hasErrors('password1')}" th:errors="*{password1}" class="fieldError"></p>

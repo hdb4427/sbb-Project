@@ -1,42 +1,47 @@
 package com.mysite.sbb.answer.service;
 
+import com.mysite.sbb.DataNotFoundException;
 import com.mysite.sbb.answer.dto.AnswerDto;
 import com.mysite.sbb.answer.entity.Answer;
 import com.mysite.sbb.answer.repository.AnswerRespository;
 import com.mysite.sbb.member.entity.Member;
 import com.mysite.sbb.question.entity.Question;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
+import java.time.LocalDateTime;
+
 @Service
+@RequiredArgsConstructor
 public class AnswerService {
 
-  private final AnswerRespository answerRespository;
+    private final AnswerRespository answerRespository;
 
-  public void create(Question question, AnswerDto answerDto, Member member) {
-    Answer answer = Answer.builder()
-        .content(answerDto.getContent())
-        .question(question)
-        .author(member) // 답변 작성자 설정
-        .build();
+    public Answer create(Question question, AnswerDto dto, Member author) {
 
-    answerRespository.save(answer);
-  }
+        Answer answer = Answer.builder()
+                .content(dto.getContent())
+                .author(author)       // Member 객체
+                .question(question)   // Question 객체
+                .createDate(LocalDateTime.now())
+                .build();
 
-  public Answer getAnswer(Long id) {
-    Answer answer = answerRespository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("답변을 찾을 수 없습니다: " + id));
-    return answer;
-  }
+        return answerRespository.save(answer);
+    }
 
-  public void modify(Answer answer, String content) {
-    answer.setContent(content);
-    answerRespository.save(answer);
-  }
+    // ID 타입 String -> Integer
+    public Answer getAnswer(Integer id) {
+        return answerRespository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("answer not found"));
+    }
 
-  public void delete(Answer answer) {
-    answerRespository.delete(answer);
-  }
+    public void modify(Answer answer, String content) {
+        answer.setContent(content);
+        answer.setModifyDate(LocalDateTime.now());
+        answerRespository.save(answer);
+    }
+
+    public void delete(Answer answer) {
+        answerRespository.delete(answer);
+    }
 }

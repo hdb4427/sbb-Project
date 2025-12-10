@@ -1,12 +1,10 @@
 package com.mysite.sbb.question.service;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Base64;
-
+import com.mysite.sbb.DataNotFoundException;
+import com.mysite.sbb.member.entity.Member;
+import com.mysite.sbb.question.entity.Question;
+import com.mysite.sbb.question.repository.QuestionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,86 +12,78 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mysite.sbb.DataNotFoundException;
-import com.mysite.sbb.member.entity.Member;
-import com.mysite.sbb.question.entity.Question;
-import com.mysite.sbb.question.repository.QuestionRepository;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
 
     public Page<Question> getList(int page, String kw) {
         List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("created"));
+        sorts.add(Sort.Order.desc("createDate"));
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-        return this.questionRepository.findAllByKeyword(kw, pageable);
-    }
 
-    public Question getQuestion(Long id) {
-        Optional<Question> question = this.questionRepository.findById(id);
-        if (question.isPresent()) {
-            return question.get();
-        } else {
-            throw new DataNotFoundException("question not found");
+        if (kw == null || kw.trim().isEmpty()) {
+            return questionRepository.findAll(pageable);
         }
+
+        return questionRepository.findBySubjectContainingIgnoreCaseOrContentContainingIgnoreCase(
+                kw, kw, pageable
+        );
     }
 
-    // 질문 생성 (이미지 포함)
-    public void create(String subject, String content, Member user,
-                       String category, LocalDate recordDate, MultipartFile file) throws IOException {
+    // ID 타입 String -> Integer 변경
+    public Question getQuestion(Integer id) {
+        return questionRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("question not found"));
+    }
 
-        Question q = new Question();
+    public void create(String subject, String content, Member user,
+                       String category, LocalDate recordDate, MultipartFile file) throws Exception {
+
+        String imageString = null;
+
+        if (file != null && !file.isEmpty()) {
+            String base64 = Base64.getEncoder().encodeToString(file.getBytes());
+            imageString = "data:" + file.getContentType() + ";base64," + base64;
+        }
+
+        Question q = Question.builder()
+                .subject(subject)
+                .content(content)
+                .createDate(LocalDate.now())
+                .author(user) // Member 객체 저장
+                .category(category)
+                .recordDate(recordDate)
+                .thumbnail(imageString)
+                .build();
+
+        questionRepository.save(q);
+    }
+
+    public void modify(Question q, String subject, String content,
+                       String category, LocalDate recordDate, MultipartFile file) throws Exception {
+
         q.setSubject(subject);
         q.setContent(content);
-        q.setAuthor(user);
         q.setCategory(category);
         q.setRecordDate(recordDate);
 
-        // 이미지 처리 (Base64) -> thumbnail 필드 사용
         if (file != null && !file.isEmpty()) {
-            String contentType = file.getContentType();
-            byte[] fileBytes = file.getBytes();
-            String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
-            String finalThumbnail = "data:" + contentType + ";base64," + base64Encoded;
-
-            q.setThumbnail(finalThumbnail); // [수정] thumbnail로 통일
+            String base64 = Base64.getEncoder().encodeToString(file.getBytes());
+            q.setThumbnail("data:" + file.getContentType() + ";base64," + base64);
         }
 
-        this.questionRepository.save(q);
+        questionRepository.save(q);
     }
 
-    // 질문 수정 (이미지, 카테고리, 날짜 포함)
-    public void modify(Question question, String subject, String content,
-                       String category, LocalDate recordDate, MultipartFile file) throws IOException {
-
-        question.setSubject(subject);
-        question.setContent(content);
-        question.setCategory(category);
-        question.setRecordDate(recordDate);
-
-        // 이미지 수정 로직: 새 파일이 있을 때만 교체
-        if (file != null && !file.isEmpty()) {
-            String contentType = file.getContentType();
-            byte[] fileBytes = file.getBytes();
-            String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
-            String finalThumbnail = "data:" + contentType + ";base64," + base64Encoded;
-
-            question.setThumbnail(finalThumbnail); // [수정] thumbnail로 통일
-        }
-
-        this.questionRepository.save(question);
-    }
-
-    public void delete(Question question) {
-        this.questionRepository.delete(question);
-    }
-
-    public void vote(Question question, Member siteUser) {
-        this.questionRepository.save(question);
+    public void delete(Question q) {
+        questionRepository.delete(q);
     }
 }
