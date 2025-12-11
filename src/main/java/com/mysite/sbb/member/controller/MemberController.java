@@ -34,7 +34,7 @@ public class MemberController {
   @GetMapping("/signup")
   public String signUp(Model model) {
     model.addAttribute("memberDto", new MemberDto());
-    return "member/signup"; // signup.html 파일을 반환
+    return "member/signup";
   }
 
   @PostMapping("/signup")
@@ -46,9 +46,8 @@ public class MemberController {
     }
 
     if (!memberDto.getPassword1().equals(memberDto.getPassword2())) {
-      // 필드명, 오류 코드, 오류 메시지
       bindingResult.rejectValue("password2", "passwordInCorrect", "2개의 패스워드가 일치하지 않습니다.");
-      return "member/signup"; // 스크립트 처리
+      return "member/signup";
     }
 
     try {
@@ -87,7 +86,7 @@ public class MemberController {
     return "redirect:/";
   }
 
-    @PreAuthorize("isAuthenticated()") // 로그인 한 사람만 접근 가능
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/setting")
     public String setting(MemberModifyForm memberModifyForm, Principal principal) {
       // 1. 현재 로그인한 사용자 정보를 가져옴

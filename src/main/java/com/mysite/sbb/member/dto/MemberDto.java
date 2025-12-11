@@ -34,10 +34,8 @@ public class MemberDto {
     @NotNull(message = "성별을 선택하세요.")
     private Gender gender;
 
-    // HTML에서 Enum 이름(DIET, BULKUP, …) 이나 한글 문자열을 보낼 수 있어서 String으로 받음
     @NotEmpty(message = "운동 목표(학과)를 선택하세요.")
-    private String department;   // 예: "DIET" 또는 "다이어트 (체지방 감량)"
+    private String department;
 
-    // 체크 안 해도 가입 가능하게 (null 허용)
     private Boolean registration;
 }

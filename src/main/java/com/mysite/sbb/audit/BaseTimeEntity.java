@@ -12,14 +12,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @EntityListeners(value = {AuditingEntityListener.class})
-@MappedSuperclass                       // 테이블로 매핑하지 않고, 자식 Entity에게 매핑 정보를 상속하기 위한 어노테이션
+@MappedSuperclass
 @Getter
 @Setter
 public class BaseTimeEntity {
-  @CreatedDate                        // 최초 생성 시점
-  @Column(updatable = false)          // 수정 불가
-  private LocalDateTime created;      // 등록일
+  @CreatedDate
+  @Column(updatable = false)
+  private LocalDateTime created;
 
-  @LastModifiedDate                   // 최종 수정 시점
-  private LocalDateTime updated;      // 수정일
+  @LastModifiedDate
+  private LocalDateTime updated;
 }

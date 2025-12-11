@@ -15,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-// 👇 여기에 extends BaseEntity가 꼭 있어야 'created' 필드를 인식합니다!
 public class Question extends BaseEntity {
 
     @Id

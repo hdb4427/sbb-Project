@@ -30,7 +30,6 @@ public class AnswerController {
     private final QuestionService questionService;
     private final MemberService memberService;
 
-    // 답변 작성 (질문 ID: String -> Integer)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create/{id}")
     public String createAnswer(
@@ -55,7 +54,6 @@ public class AnswerController {
         return "redirect:/question/detail/" + id;
     }
 
-    // 답변 수정 (답변 ID: String -> Integer)
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
     public String modifyAnswerForm(@PathVariable("id") Integer id, AnswerDto answerDto, Principal principal) {
@@ -95,7 +93,6 @@ public class AnswerController {
         return "redirect:/question/detail/" + answer.getQuestion().getId();
     }
 
-    // 답변 삭제 (답변 ID: String -> Integer)
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
     public String deleteAnswer(@PathVariable("id") Integer id, Principal principal) {

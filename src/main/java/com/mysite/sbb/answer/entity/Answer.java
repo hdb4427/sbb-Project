@@ -12,7 +12,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-// 👇 여기에 extends BaseEntity가 반드시 있어야 'created'를 인식합니다.
 public class Answer extends BaseEntity {
 
     @Id

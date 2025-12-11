@@ -9,8 +9,6 @@ import com.mysite.sbb.question.entity.Question;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-// import java.time.LocalDateTime; // ❌ 날짜 관련 import 삭제 (자동 처리됨)
-
 @Service
 @RequiredArgsConstructor
 public class AnswerService {
@@ -23,7 +21,6 @@ public class AnswerService {
                 .content(dto.getContent())
                 .author(author)
                 .question(question)
-                // .createDate(LocalDateTime.now()) ❌ 삭제 (BaseEntity가 자동 처리)
                 .build();
 
         return answerRespository.save(answer);
@@ -36,7 +33,6 @@ public class AnswerService {
 
     public void modify(Answer answer, String content) {
         answer.setContent(content);
-        // answer.setModifyDate(LocalDateTime.now()); ❌ 삭제 (BaseEntity가 자동 처리)
         answerRespository.save(answer);
     }
 

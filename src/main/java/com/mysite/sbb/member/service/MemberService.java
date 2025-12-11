@@ -64,7 +64,6 @@ public class MemberService {
         Department department = Department.valueOf(departmentStr);
         member.setDepartment(department);
 
-        // ✅ 프로필 사진 변경 로직
         if (file != null && !file.isEmpty()) {
             String imageString = resizeImage(file, 200);
             member.setProfileImage(imageString);
@@ -73,7 +72,6 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    // ✅ 이미지 리사이징 유틸 메서드
     private String resizeImage(MultipartFile file, int targetWidth) throws IOException {
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
         if (originalImage == null) return null;

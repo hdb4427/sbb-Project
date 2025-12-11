@@ -12,7 +12,6 @@ public class AuditorAwareImpl implements AuditorAware<String> {
 
   @Override
   public Optional<String> getCurrentAuditor() {
-    // 현재 사용자를 가져오는 메소드(인증 정보 확인)
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
     String userId = "";

@@ -36,7 +36,6 @@ public class QuestionController {
                        @RequestParam(value = "kw", defaultValue = "") String kw,
                        @RequestParam(value = "category", defaultValue = "") String category) { // ✅ 추가
 
-        // 서비스에 category 전달
         Page<Question> paging = this.questionService.getList(page, kw, category);
 
         model.addAttribute("paging", paging);
@@ -46,7 +45,6 @@ public class QuestionController {
         return "question/list";
     }
 
-    // 질문 상세 (ID: String -> Integer)
     @GetMapping("/detail/{id}")
     public String detail(Model model, @PathVariable("id") Integer id, AnswerDto answerForm) {
         Question question = questionService.getQuestion(id);
@@ -54,7 +52,6 @@ public class QuestionController {
         return "question/detail";
     }
 
-    // 질문 등록 폼 이동
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String createQuestion(Model model) {
@@ -62,7 +59,6 @@ public class QuestionController {
         return "question/inputForm";
     }
 
-    // 질문 등록 처리
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
     public String createQuestion(@Valid QuestionForm questionForm,
@@ -87,7 +83,6 @@ public class QuestionController {
         return "redirect:/question/list";
     }
 
-    // 질문 수정 폼 (ID: String -> Integer)
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
     public String modifyQuestion(@PathVariable("id") Integer id,
@@ -96,7 +91,6 @@ public class QuestionController {
 
         Question question = questionService.getQuestion(id);
 
-        // 작성자 검증 로직 변경 (객체 -> getUsername)
         if (!question.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정 권한이 없습니다.");
         }
@@ -109,7 +103,6 @@ public class QuestionController {
         return "question/inputForm";
     }
 
-    // 질문 수정 처리 (ID: String -> Integer)
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
     public String modifyQuestion(@PathVariable("id") Integer id,
@@ -140,7 +133,6 @@ public class QuestionController {
         return "redirect:/question/detail/" + id;
     }
 
-    // 질문 삭제 (ID: String -> Integer)
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
     public String deleteQuestion(@PathVariable("id") Integer id, Principal principal) {

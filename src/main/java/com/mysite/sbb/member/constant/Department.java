@@ -4,8 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum Department {
-    // HTML의 <option value="DIET"> 처럼 value 값과 영문 철자가 똑같아야 합니다.
-
     DIET("다이어트 (체지방 감량)"),
     BULKUP("벌크업 (근육량 증가)"),
     PROFILE("바디프로필 (단기간 집중)"),

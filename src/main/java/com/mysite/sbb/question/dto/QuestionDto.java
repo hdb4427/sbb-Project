@@ -23,6 +23,5 @@ public class QuestionDto {
     @NotEmpty(message = "내용은 필수항목입니다.")
     private String content;
 
-    // [추가] 화면에서 넘겨주는 파일 리스트 받기
     private List<MultipartFile> files;
 }

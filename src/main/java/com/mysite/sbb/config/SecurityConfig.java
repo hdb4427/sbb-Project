@@ -14,7 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)  // @PreAuthorize 애노테이션을 메서드 단위로 사용하기 위해 필요
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
   @Bean
